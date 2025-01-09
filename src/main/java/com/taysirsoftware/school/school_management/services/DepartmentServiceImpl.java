@@ -40,13 +40,13 @@ public class DepartmentServiceImpl implements DepartmentService {
         dto.setIdDepartment(department.getIdDepartment());
         dto.setNameDepartment(department.getNameDepartment());
         dto.setDescriptionDepartment(department.getDescriptionDepartment());
-        dto.setSectors(department.getSectors().stream().map(filiere -> {
-            SectorDto filiereDTO = new SectorDto();
-            filiereDTO.setIdSector(filiere.getIdSector());
-            filiereDTO.setNameSector(filiere.getNameSector());
-            filiereDTO.setAcronym(filiere.getAcronym());
-            filiereDTO.setDescription(filiere.getDescription());
-            return filiereDTO;
+        dto.setSectors(department.getSectors().stream().map(sector -> {
+            SectorDto sectorDto = new SectorDto();
+            sectorDto.setIdSector(sector.getIdSector());
+            sectorDto.setNameSector(sector.getNameSector());
+            sectorDto.setAcronym(sector.getAcronym());
+            sectorDto.setDescription(sector.getDescription());
+            return sectorDto;
         }).collect(Collectors.toList()));
         return dto;
     }
