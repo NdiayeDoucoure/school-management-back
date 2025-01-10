@@ -53,10 +53,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentDto createDepartment(DepartmentDto departmentDto) {
+        // Créer un nouveau département à partir du DTO reçu
         Department department = new Department();
         department.setNameDepartment(departmentDto.getNameDepartment());
         department.setDescriptionDepartment(departmentDto.getDescriptionDepartment());
 
+        // Vérification des secteurs et ajout au département
         if (departmentDto.getSectors() != null) {
             department.setSectors(departmentDto.getSectors().stream().map(sectorDto -> {
                 Sector sector = new Sector();
@@ -68,8 +70,16 @@ public class DepartmentServiceImpl implements DepartmentService {
             }).collect(Collectors.toList()));
         }
 
+        // Sauvegarder le département dans la base de données
         Department savedDepartment = departmentRepo.save(department);
-        return getDepartmentById(savedDepartment.getIdDepartment());
+
+        // Retourner le DTO avec les informations du département, y compris l'ID généré
+        return new DepartmentDto(
+                savedDepartment.getIdDepartment(),
+                savedDepartment.getNameDepartment(),
+                savedDepartment.getDescriptionDepartment(),
+                savedDepartment.getSectors().stream().map(sector -> new SectorDto(sector.getNameSector(), sector.getAcronym(), sector.getDescription())).collect(Collectors.toList())
+        );
     }
 
     @Override

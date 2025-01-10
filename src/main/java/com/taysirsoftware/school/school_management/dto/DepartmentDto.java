@@ -11,6 +11,9 @@ public class DepartmentDto {
     public DepartmentDto() {
     }
 
+    public DepartmentDto(Long idDepartment, String nameDepartment, String descriptionDepartment, List<SectorDto> collect) {
+    }
+
     // Getters et setters pour idDepartment
     public Long getIdDepartment() {
         return idDepartment;

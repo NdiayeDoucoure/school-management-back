@@ -9,6 +9,9 @@ public class SectorDto {
     public SectorDto() {
     }
 
+    public SectorDto(String nameSector, String acronym, String description) {
+    }
+
     public Long getIdSector() {
         return idSector;
     }
