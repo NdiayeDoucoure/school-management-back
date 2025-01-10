@@ -6,6 +6,8 @@ import com.taysirsoftware.school.school_management.entities.Department;
 import com.taysirsoftware.school.school_management.entities.Sector;
 import com.taysirsoftware.school.school_management.exception.ResourceNotFoundException;
 import com.taysirsoftware.school.school_management.repo.DepartmentRepo;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,20 +22,21 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<DepartmentDto> getAllDepartments() {
-        return departmentRepo.findAll().stream()
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
+        List<DepartmentDto> departments = departmentRepo.findAll().stream()
                 .map(dept -> {
                     DepartmentDto dto = new DepartmentDto();
                     dto.setIdDepartment(dept.getIdDepartment());
                     dto.setNameDepartment(dept.getNameDepartment());
                     dto.setDescriptionDepartment(dept.getDescriptionDepartment());
-                    return dto; // Pas de filières incluses ici
+                    return dto;
                 })
                 .collect(Collectors.toList());
+        return new ResponseEntity<>(departments, HttpStatus.OK);
     }
 
     @Override
-    public DepartmentDto getDepartmentById(Long id) {
+    public ResponseEntity<DepartmentDto> getDepartmentById(Long id) {
         Department department = departmentRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
         DepartmentDto dto = new DepartmentDto();
@@ -48,11 +51,11 @@ public class DepartmentServiceImpl implements DepartmentService {
             sectorDto.setDescription(sector.getDescription());
             return sectorDto;
         }).collect(Collectors.toList()));
-        return dto;
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @Override
-    public DepartmentDto createDepartment(DepartmentDto departmentDto) {
+    public ResponseEntity<DepartmentDto> createDepartment(DepartmentDto departmentDto) {
         Department department = new Department();
         department.setNameDepartment(departmentDto.getNameDepartment());
         department.setDescriptionDepartment(departmentDto.getDescriptionDepartment());
@@ -70,16 +73,18 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         Department savedDepartment = departmentRepo.save(department);
 
-        return new DepartmentDto(
+        DepartmentDto departmentResponseDto = new DepartmentDto(
                 savedDepartment.getIdDepartment(),
                 savedDepartment.getNameDepartment(),
                 savedDepartment.getDescriptionDepartment(),
                 savedDepartment.getSectors().stream().map(sector -> new SectorDto(sector.getNameSector(), sector.getAcronym(), sector.getDescription())).collect(Collectors.toList())
         );
+
+        return new ResponseEntity<>(departmentResponseDto, HttpStatus.CREATED);
     }
 
     @Override
-    public DepartmentDto updateDepartment(Long id, DepartmentDto departmentDto) {
+    public ResponseEntity<DepartmentDto> updateDepartment(Long id, DepartmentDto departmentDto) {
         Department department = departmentRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
 
@@ -99,14 +104,22 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
 
         Department updatedDepartment = departmentRepo.save(department);
-        return getDepartmentById(updatedDepartment.getIdDepartment());
+
+        DepartmentDto departmentResponseDto = new DepartmentDto(
+                updatedDepartment.getIdDepartment(),
+                updatedDepartment.getNameDepartment(),
+                updatedDepartment.getDescriptionDepartment(),
+                updatedDepartment.getSectors().stream().map(sector -> new SectorDto(sector.getNameSector(), sector.getAcronym(), sector.getDescription())).collect(Collectors.toList())
+        );
+
+        return new ResponseEntity<>(departmentResponseDto, HttpStatus.OK);
     }
 
     @Override
-    public void deleteDepartment(Long id) {
+    public ResponseEntity<Void> deleteDepartment(Long id) {
         Department department = departmentRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
         departmentRepo.delete(department);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
-
